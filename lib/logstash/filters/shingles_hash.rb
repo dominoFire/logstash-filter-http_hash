@@ -33,20 +33,19 @@ class LogStash::Filters::ShinglesHash < LogStash::Filters::Base
 
   public
   def filter(event)
-    hash_shingles = nil
     begin
       input_text = event[@input_field]
-      text_shingles = TextTools::shingles(input_text, @k)
+      text_shingles = TextTools::get_shingles(input_text, @k)
       hash_shingles = []
-      for i in 0..(text_shingles.length -1)
-        puts i
-        hash_shingles[i] = Hasher::do_hash(text_shingles[i], 'sha256').force_encoding(Encoding::UTF_8)[24..31].to_i(16)
+      for i in 0..(text_shingles.length() - 1)
+        val = Hasher::do_hash(text_shingles[i], 'sha256').force_encoding(Encoding::UTF_8)[24..31].to_i(16)
+        hash_shingles[i] = val
       end
-    rescue
-      hash_shingles = nil
+      event[@output_field] = hash_shingles
+    rescue Exception => e
+      @logger.error("FUUUUUUU: " + e.message)
+      event[@output_field] = nil
     end
-
-    event[@output_field] = hash_shingles
     # filter_matched should go in the last line of our successful code
     filter_matched(event)
   end # def filter
