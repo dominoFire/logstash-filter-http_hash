@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'logstash-filter-shingles_hash'
-  s.version = '0.1.0'
+  s.version = '0.2.0'
   s.licenses = ['Apache License (2.0)']
   s.summary = "Hashed shingles!"
   s.description = "This filter shingles a text field and return an array of SHA256 integer hashed shingles!"

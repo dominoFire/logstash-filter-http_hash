@@ -17,7 +17,20 @@ describe LogStash::Filters::ShinglesHash do
 
     sample("msg" => "Hola como estas") do
       expect(subject).to include("msg_hash")
-      puts subject["msg_hash"]
+      print subject["msg_hash"]
+      puts "\n"
+    end
+
+    sample("msg" => "") do
+      expect(subject).to include("msg_hash")
+      print subject["msg_hash"]
+      puts "\n"
+    end
+
+    sample("msg" => nil) do
+      expect(subject).to include("msg_hash")
+      print subject["msg_hash"]
+      puts "\n"
     end
   end
 end

@@ -2,7 +2,7 @@
 require "logstash/filters/base"
 require "logstash/namespace"
 require "helpers/hasher"
-require "helpers/text_tools"
+require "helpers/texttools"
 
 # This example filter will replace the contents of the default
 # message field with whatever you specify in the configuration.
@@ -34,16 +34,21 @@ class LogStash::Filters::ShinglesHash < LogStash::Filters::Base
   public
   def filter(event)
     begin
-      input_text = event[@input_field]
-      text_shingles = TextTools::get_shingles(input_text, @k)
+      # cleanText
+      input_text = TextTools.clean_text(event[@input_field])
+      
+      @logger.debug("Text to slice: " + input_text)
+
+      text_shingles = TextTools.get_shingles(input_text, @k)
       hash_shingles = []
       for i in 0..(text_shingles.length() - 1)
-        val = Hasher::do_hash(text_shingles[i], 'sha256').force_encoding(Encoding::UTF_8)[24..31].to_i(16)
+        val = Hasher.do_hash(text_shingles[i], 'sha256').force_encoding(Encoding::UTF_8)[0..7].to_i(16)
         hash_shingles[i] = val
       end
       event[@output_field] = hash_shingles
     rescue Exception => e
-      @logger.error("FUUUUUUU: " + e.message)
+      @logger.error("FUUUUUUU: \n" + e.backtrace.join("\n"))
+
       event[@output_field] = nil
     end
     # filter_matched should go in the last line of our successful code
